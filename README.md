@@ -8,17 +8,21 @@
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 
-# tutor-plugin-build-backup
+# tutor-plugin-build-mfe
 
-Github Action to build a Docker image of the Tutor plugin "Backup & Restore", and upload to an AWS Elastic Container Registry repository.
+Github Action to use Tutor to build a Docker image of Open edX Micro Front-end (MFE) framework, and upload to an AWS Elastic Container Registry repository.
 
 ## About this plugin
 
-The "Backup & Restore" plugin is authored by hastexo: [https://github.com/hastexo/tutor-contrib-backup](https://github.com/hastexo/tutor-contrib-backup).
+The "Micro Frontend base plugin for Tutor" plugin is authored by overerhangio: [https://github.com/overhangio/tutor-mfe](https://github.com/overhangio/tutor-mfe).
 
-This is an experimental plugin for Tutor that provides backup and restore functionality for MySQL, MongoDB, and Caddy services in both local and Kubernetes Tutor deployments.
+This plugin makes it possible to easily add micro frontend (MFE) applications on top of an Open edX platform that runs with Tutor. To learn more about MFEs, please check the official Open edX documentation.
 
-In Kubernetes, the plugin runs the backup job as a CronJob by default. You can also run the backup job from the command line. In both cases the backup tar file is stored in an S3 bucket. Then, in a new Kubernetes deployment, you can use the restore command to restore your Open edX environment. You can even schedule the restore as a CronJob to periodically download the latest backup and restore your environment. This can, for example, be useful if you want to maintain a standby site for disaster recovery purposes.
+In addition, this plugin comes with a few MFEs which are enabled by default:
+- Account
+- Gradebook
+- Learning
+- Profile
 
 ## Usage:
 
@@ -49,8 +53,10 @@ jobs:
       #  - aws-ecr-repo: default value is openedx_backup
       #  - hastexo-backup-release: default is latest stable
       - name: Build the image and upload to AWS ECR
-        uses: openedx-actions/tutor-plugin-build-backup
+        uses: openedx-actions/tutor-plugin-build-mfe
         with:
-          aws-ecr-repo: openedx_backup
-          hastexo-backup-release: 'v0.0.6'
+          aws-ecr-repository: openedx_mfe
+          subdomain: 'www'
+          domain-name: 'example.com'
+          site-name: 'School of Rock'
 ```
