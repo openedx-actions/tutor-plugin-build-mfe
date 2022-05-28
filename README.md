@@ -49,9 +49,7 @@ jobs:
           aws-region: us-east-2
 
       # This action.
-      # Note that both inputs are optional.
-      #  - aws-ecr-repo: default value is openedx_backup
-      #  - hastexo-backup-release: default is latest stable
+      # Note that aws-ecr-repo is optional. The default value is openedx_mfe
       - name: Build the image and upload to AWS ECR
         uses: openedx-actions/tutor-plugin-build-mfe
         with:
