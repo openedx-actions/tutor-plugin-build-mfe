@@ -22,7 +22,7 @@ inputs:
     description: 'University of the Galaxy'
     required: true
   aws-ecr-repository:
-    description: 'The name of the repository inside your AWS Elastic Container Registry (ECR) in which the newly created container will be uploaded and tagged. Defaults to "openedx_backup"'
+    description: 'The name of the repository inside your AWS Elastic Container Registry (ECR) in which the newly created container will be uploaded and tagged. Defaults to "openedx_mfe"'
     required: false
     default: 'openedx_mfe'
 outputs:
@@ -80,7 +80,7 @@ runs:
 
     - name: Build the image
       id: tutor-build-image
-      run: tutor images build backup
+      run: tutor images build mfe
       shell: bash
 
     - name: Push the image
