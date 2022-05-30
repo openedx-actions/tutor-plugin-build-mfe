@@ -51,7 +51,7 @@ runs:
 
     - name: Install Tutor
       id: install-tutor
-      run: $GITHUB_WORKSPACE/scripts/install-tutor.sh
+      run: ${{ github.action_path }}/scripts/install-tutor.sh
       shell: bash
 
     - name: Intialize environment variables
@@ -93,7 +93,7 @@ runs:
 
     - name: Install plugin
       id: pip-install-plugin
-      run: $GITHUB_WORKSPACE/scripts/install-plugin.sh
+      run: ${{ github.action_path }}/scripts/install-plugin.sh
       shell: bash
 
     - name: Build the image
@@ -103,7 +103,7 @@ runs:
 
     - name: Push the image
       id: docker-push-image
-      run: $GITHUB_WORKSPACE/scripts/upload-to-aws-ecr.sh
+      run: ${{ github.action_path }}/scripts/upload-to-aws-ecr.sh
       shell: bash
 
     - name: Docker image:tag
