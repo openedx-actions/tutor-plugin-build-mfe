@@ -32,65 +32,82 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v1
-
-    - name: Setup environment
-      run: |
-        echo "AWS_ECR_REPOSITORY=${{ inputs.aws-ecr-repository }}" >> $GITHUB_ENV
-        echo "SUBDOMAIN=${{ inputs.subdomain }}" >> $GITHUB_ENV
-        echo "DOMAIN_NAME=${{ inputs.domain-name }}" >> $GITHUB_ENV
-        echo "SITE_NAME=${{ inputs.site-name }}" >> $GITHUB_ENV
-      shell: bash
+    - uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
       id: setup-docker
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v1.4.0
 
-    - name: Intialize environment variables
-      id: init-env
-      run: |
-        echo "AWS_ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
-      shell: bash
-
+    # verify that the ECR repository exists. If not, then create it.
     - name: Create the AWS ECR repository
       id: create-repository
-      uses: openedx-actions/aws-ecr-create@v0.0.2
+      uses: lpm0073/aws-ecr-create@v0.0.2
       with:
         aws-ecr-repository: ${{ inputs.aws-ecr-repository }}
 
     - name: Install Tutor
       id: install-tutor
-      run: $GITHUB_ACTION_PATH/scripts/install-tutor.sh
+      run: ./scripts/install-tutor.sh
       shell: bash
 
-    - name: Set repository tag
-      id: docker-set-tag
+    - name: Intialize environment variables
+      id: init-env
       run: |
-        echo "REPOSITORY_TAG=$TUTOR_VERSION-$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+        echo "AWS_ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> ${{ github.env }}
+        echo "AWS_ECR_REPOSITORY=${{ inputs.aws-ecr-repository }}" >> ${{ github.env }}
+        echo "REPOSITORY_TAG=$TUTOR_VERSION-$(date +%Y%m%d%H%M)" >> ${{ github.env }}
+
+        echo "SUBDOMAIN=${{ inputs.subdomain }}" >> $GITHUB_ENV
+        echo "DOMAIN_NAME=${{ inputs.domain-name }}" >> $GITHUB_ENV
+        echo "SITE_NAME=${{ inputs.site-name }}" >> $GITHUB_ENV
+
       shell: bash
 
-    - name: Install mfe plugin
+    - name: Initialize Docker image URI
+      id: init-docker-image
+      run: |
+        echo "DOCKER_IMAGE=${AWS_ECR_REGISTRY}/${AWS_ECR_REPOSITORY}:${REPOSITORY_TAG}" >> ${{ github.env }}
+      shell: bash
+
+    # Note: This is scaffolding. This step initialize the tutor 'env' path, which you might need
+    #       if for example, you need to add Python requirements to the image
+    - name: Render Tutor Config
+      id: tutor-config-save
+      run: tutor config save --set MFE_DOCKER_IMAGE=${DOCKER_IMAGE}
+      shell: bash
+
+    # Note: This is scaffolding. Add environment initialization stuff to this step
+    #       that requires that a.) tutor is installed, and b.) the tutor environment
+    #       is initialized.
+    #
+    #       Example: to add requirements to a build: $(tutor config printroot)/env/build/credentials/requirements
+    - name: Set Tutor-dependent environment variables
+      id: tutor-environment-variables
+      run: |
+        echo "scaffolding for Tutor-dependent environment variables"
+      shell: bash
+
+    - name: Install plugin
       id: pip-install-plugin
-      run: $GITHUB_ACTION_PATH/scripts/install-mfe.sh
+      run: ./scripts/install-plugin.sh
       shell: bash
 
     - name: Build the image
       id: tutor-build-image
-      run: tutor images build mfe
+      run: tutor images build credentials
       shell: bash
 
     - name: Push the image
       id: docker-push-image
-      run: $GITHUB_ACTION_PATH/scripts/upload-to-aws-ecr.sh
+      run: ./scripts/upload-to-aws-ecr.sh
       shell: bash
 
     - name: Docker image:tag
       id: docker-image
       run: |
-        echo "DOCKER_IMAGE=${{ inputs.aws-ecr-registry }}/${{ inputs.aws-ecr-repository }}:${REPOSITORY_TAG}" >> $GITHUB_ENV
         echo "::set-output name=uri::$(echo $DOCKER_IMAGE)"
       shell: bash
