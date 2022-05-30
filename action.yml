@@ -84,7 +84,7 @@ runs:
     #       that requires that a.) tutor is installed, and b.) the tutor environment
     #       is initialized.
     #
-    #       Example: to add requirements to a build: $(tutor config printroot)/env/build/credentials/requirements
+    #       Example: to add requirements to a build: $(tutor config printroot)/env/build/mfe/requirements
     - name: Set Tutor-dependent environment variables
       id: tutor-environment-variables
       run: |
@@ -98,7 +98,7 @@ runs:
 
     - name: Build the image
       id: tutor-build-image
-      run: tutor images build credentials
+      run: tutor images build mfe
       shell: bash
 
     - name: Push the image
