@@ -50,7 +50,7 @@ jobs:
       # This action.
       # Note that aws-ecr-repo is optional. The default value is openedx_mfe
       - name: Build the image and upload to AWS ECR
-        uses: openedx-actions/tutor-plugin-build-mfe
+        uses: openedx-actions/tutor-plugin-build-mfe@0.1.1
         with:
           aws-ecr-repository: openedx_mfe
           subdomain: 'www'
