@@ -6,7 +6,7 @@
 #  - https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
 #
 #------------------------------------------------------------------------------
-name: '"Build Tutor Open edX Micro Front-end (MFE) Plugin" Action For GitHub Actions'
+name: Open edX Tutor k8s build Micro Front-end (MFE) plugin
 description: 'Use Tutor to build a Docker container for the Open edX Micro Front-end plugin, then upload to AWS ECR'
 branding:
   icon: 'cloud'
