@@ -11,7 +11,7 @@
 
 pip install tutor-mfe
 tutor plugins enable mfe
-tutor config save --set MFE_DOCKER_IMAGE=${AWS_ECR_REGISTRY}/${AWS_ECR_REPOSITORY}:${REPOSITORY_TAG}
+tutor config save --set MFE_DOCKER_IMAGE=${AWS_ECR_REGISTRY_MFE}/${AWS_ECR_REPOSITORY_MFE}:${REPOSITORY_TAG_MFE}
 
 # build the production environment file
 cat <<EOT >> "$(tutor config printroot)/env/plugins/mfe/build/mfe/env/production"
