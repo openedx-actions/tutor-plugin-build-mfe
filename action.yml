@@ -53,9 +53,9 @@ runs:
       id: init-env
       shell: bash
       run: |
-        echo "AWS_ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
-        echo "AWS_ECR_REPOSITORY=${{ inputs.aws-ecr-repository }}" >> $GITHUB_ENV
-        echo "REPOSITORY_TAG=$TUTOR_VERSION-$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+        echo "AWS_ECR_REGISTRY_MFE=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
+        echo "AWS_ECR_REPOSITORY_MFE=${{ inputs.aws-ecr-repository }}" >> $GITHUB_ENV
+        echo "REPOSITORY_TAG_MFE=$TUTOR_VERSION-$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
 
         echo "SUBDOMAIN=${{ inputs.subdomain }}" >> $GITHUB_ENV
         echo "DOMAIN_NAME=${{ inputs.domain-name }}" >> $GITHUB_ENV
@@ -66,14 +66,14 @@ runs:
       id: init-docker-image
       shell: bash
       run: |
-        echo "DOCKER_IMAGE=${AWS_ECR_REGISTRY}/${AWS_ECR_REPOSITORY}:${REPOSITORY_TAG}" >> $GITHUB_ENV
+        echo "DOCKER_IMAGE_MFE=${AWS_ECR_REGISTRY_MFE}/${AWS_ECR_REPOSITORY_MFE}:${REPOSITORY_TAG_MFE}" >> $GITHUB_ENV
 
     # Note: This is scaffolding. This step initialize the tutor 'env' path, which you might need
     #       if for example, you need to add Python requirements to the image
     - name: Render Tutor Config
       id: tutor-config-save
       shell: bash
-      run: tutor config save --set MFE_DOCKER_IMAGE=${DOCKER_IMAGE}
+      run: tutor config save --set MFE_DOCKER_IMAGE=${DOCKER_IMAGE_MFE}
 
     # Note: This is scaffolding. Add environment initialization stuff to this step
     #       that requires that a.) tutor is installed, and b.) the tutor environment
@@ -105,4 +105,4 @@ runs:
       id: docker-image
       shell: bash
       run: |
-        echo "::set-output name=uri::$(echo $DOCKER_IMAGE)"
+        echo "::set-output name=uri::$(echo $DOCKER_IMAGE_MFE)"
