@@ -49,7 +49,7 @@ jobs:
 
       # install and configure tutor and kubectl
       - name: Configure Github workflow environment
-        uses: openedx-actions/tutor-k8s-init@v0.0.13
+        uses: openedx-actions/tutor-k8s-init@v1.0.0
 
       # This action.
       # Note that aws-ecr-repo is optional. The default value is openedx_mfe
