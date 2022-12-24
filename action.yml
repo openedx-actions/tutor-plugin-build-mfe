@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------------
-#
+# written by: Lawrence McDaniel
+#             https://lawrencemcdaniel.com
 #
 # see
 #  - https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
@@ -32,7 +33,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3.0.2
+    - uses: actions/checkout@v3.2.0
 
     - name: Set up Docker Buildx
       id: setup-docker
@@ -40,7 +41,7 @@ runs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1.4.0
+      uses: aws-actions/amazon-ecr-login@v1.5.3
 
     # verify that the ECR repository exists. If not, then create it.
     - name: Create the AWS ECR repository
@@ -89,7 +90,33 @@ runs:
     - name: Install plugin
       id: pip-install-plugin
       shell: bash
-      run: ${{ github.action_path }}/scripts/install-plugin.sh
+      run: |
+        pip install tutor-mfe
+        tutor plugins enable mfe
+        tutor config save --set MFE_DOCKER_IMAGE=${AWS_ECR_REGISTRY_MFE}/${AWS_ECR_REPOSITORY_MFE}:${REPOSITORY_TAG_MFE} \
+                          --set MFE_ACCESS_TOKEN_COOKIE_NAME='edx-jwt-cookie-header-payload' \
+                          --set MFE_BASE_URL='https://apps.${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_CSRF_TOKEN_API_PATH='/csrf/api/v1/token' \
+                          --set MFE_CREDENTIALS_BASE_URL='https://credentials.${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_DISCOVERY_API_BASE_URL='https://discovery.${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_ECOMMERCE_BASE_URL='https://ecommerce.${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_ENABLE_NEW_RELIC='false' \
+                          --set MFE_FAVICON_URL='https://cdn.${SUBDOMAIN}.${DOMAIN_NAME}/favicon.ico' \
+                          --set MFE_LANGUAGE_PREFERENCE_COOKIE_NAME='openedx-language-preference' \
+                          --set MFE_LMS_BASE_URL='https://${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_LOGIN_URL='https://${SUBDOMAIN}.${DOMAIN_NAME}/login' \
+                          --set MFE_LOGO_URL='https://cdn.${SUBDOMAIN}.${DOMAIN_NAME}/logo.png' \
+                          --set MFE_LOGO_TRADEMARK_URL='https://cdn.${SUBDOMAIN}.${DOMAIN_NAME}/logo.png' \
+                          --set MFE_LOGO_WHITE_URL='https://cdn.${SUBDOMAIN}.${DOMAIN_NAME}/logo.png' \
+                          --set MFE_LOGOUT_URL='https://${SUBDOMAIN}.${DOMAIN_NAME}/logout' \
+                          --set MFE_MARKETING_SITE_BASE_URL='https://${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_NODE_ENV=production \
+                          --set MFE_PUBLISHER_BASE_URL='' \
+                          --set MFE_REFRESH_ACCESS_TOKEN_ENDPOINT='https://${SUBDOMAIN}.${DOMAIN_NAME}/login_refresh' \
+                          --set MFE_SEGMENT_KEY='' \
+                          --set MFE_SITE_NAME='${SITE_NAME}' \
+                          --set MFE_STUDIO_BASE_URL='https://studio.${SUBDOMAIN}.${DOMAIN_NAME}' \
+                          --set MFE_USER_INFO_COOKIE_NAME='user-info' \
 
     - name: Build the image
       id: tutor-build-image
@@ -99,7 +126,10 @@ runs:
     - name: Push the image
       id: docker-push-image
       shell: bash
-      run: ${{ github.action_path }}/scripts/upload-to-aws-ecr.sh
+      run: |
+        tutor images push mfe
+        docker tag ${AWS_ECR_REGISTRY_MFE}/${AWS_ECR_REPOSITORY_MFE}:${REPOSITORY_TAG_MFE} ${AWS_ECR_REGISTRY_MFE}/${AWS_ECR_REPOSITORY_MFE}:latest
+        docker push ${AWS_ECR_REGISTRY_MFE}/${AWS_ECR_REPOSITORY_MFE}:latest
 
     - name: Docker image:tag
       id: docker-image
