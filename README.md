@@ -9,6 +9,8 @@
 
 # tutor-plugin-build-mfe
 
+**DEPRECATED**: tutor version v14.x and newer maintains a Docker build of the mfe plugin. Hereon, you should use Tutor's mfe build.
+
 Github Action to use Tutor to build a Docker image of Open edX Micro Front-end (MFE) framework, and upload to an AWS Elastic Container Registry repository.
 
 ## About this plugin
