@@ -41,7 +41,7 @@ runs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1.5.3
+      uses: aws-actions/amazon-ecr-login@v1.6.0
 
     # verify that the ECR repository exists. If not, then create it.
     - name: Create the AWS ECR repository
