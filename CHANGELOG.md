@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## Version 0.1.7 (2023-06-27)
+
+- version bumps
+
 ## Version 0.1.6 (2022-12-23)
 
 * refactor for Tutor version 15
